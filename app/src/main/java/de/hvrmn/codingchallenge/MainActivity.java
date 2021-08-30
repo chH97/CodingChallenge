@@ -19,13 +19,16 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        setUpMapView(savedInstanceState);
+    }
+
+    private void setUpMapView(Bundle savedInstanceState) {
         Bundle mapViewBundle = null;
         if (savedInstanceState != null) {
             mapViewBundle = savedInstanceState.getBundle(BUNDLE_KEY);
         }
         mapView = findViewById(R.id.mapView);
         mapView.onCreate(mapViewBundle);
-
         mapView.getMapAsync(this);
     }
 
