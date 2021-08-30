@@ -8,6 +8,7 @@ import androidx.core.content.ContextCompat;
 import android.Manifest;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.widget.TextView;
 
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -16,7 +17,11 @@ import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import de.hvrmn.codingchallenge.datafetching.DataFetcher;
 import de.hvrmn.codingchallenge.datafetching.DataFetcherCallback;
@@ -29,13 +34,16 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     private MapView mapView;
     private GoogleMap googleMap;
-
     private LatLngBounds initialFitAllMarkerBounds;
+    private List<Marker> markers;
+    private Marker currentMarker;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        markers = new ArrayList<>();
+        currentMarker = null;
 
         setUpMapView(savedInstanceState);
 
@@ -72,14 +80,54 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             LatLngBounds.Builder builder = new LatLngBounds.Builder();
             for (Car car : dataset.getPlacemarks()) {
                 LatLng position = new LatLng(car.getCoordinates().get(1), car.getCoordinates().get(0));
-                googleMap.addMarker(new MarkerOptions().position(position).title(car.getName()));
+                Marker marker = googleMap.addMarker(new MarkerOptions().position(position).title(car.getName()));
+                marker.setTag(car);
+                markers.add(marker);
                 builder.include(position);
             }
+            setUpListeners();
             initialFitAllMarkerBounds = builder.build();
             animateCameraToFitBounds(initialFitAllMarkerBounds);
         } else {
             // TODO
         }
+    }
+
+    private void setUpListeners() {
+        googleMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
+            @Override
+            public boolean onMarkerClick(@NonNull Marker marker) {
+                TextView t = findViewById(R.id.name);
+                t.setText(marker.getTitle());
+                if (currentMarker != null && currentMarker.equals(marker)) {
+                    setAllMarkersVisible();
+                    marker.hideInfoWindow();
+                    currentMarker = null;
+                    return true;
+                } else {
+                    currentMarker = marker;
+                    displayOnlyOneMarker(marker);
+                }
+                return false;
+            }
+        });
+
+        googleMap.setOnInfoWindowClickListener(new GoogleMap.OnInfoWindowClickListener() {
+            @Override
+            public void onInfoWindowClick(@NonNull Marker marker) {
+                marker.hideInfoWindow();
+                setAllMarkersVisible();
+                currentMarker = null;
+            }
+        });
+
+        googleMap.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
+            @Override
+            public void onMapClick(@NonNull LatLng latLng) {
+                setAllMarkersVisible();
+                currentMarker = null;
+            }
+        });
     }
 
     private void animateCameraToFitBounds(LatLngBounds bounds) {
@@ -91,6 +139,8 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     @Override
     public void onMapReady(GoogleMap map) {
         googleMap = map;
+        googleMap.getUiSettings().setMapToolbarEnabled(false);
+        googleMap.getUiSettings().setMyLocationButtonEnabled(false);
         requestPermissionAndEnableMyLocation();
     }
 
@@ -107,6 +157,20 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 1);
         } else {
             googleMap.setMyLocationEnabled(true);
+        }
+    }
+
+    private void displayOnlyOneMarker(Marker highlightedMarker) {
+        for (Marker marker : markers) {
+            if (!marker.equals(highlightedMarker)) {
+                marker.setVisible(false);
+            }
+        }
+    }
+
+    private void setAllMarkersVisible() {
+        for (Marker marker : markers) {
+            marker.setVisible(true);
         }
     }
 
