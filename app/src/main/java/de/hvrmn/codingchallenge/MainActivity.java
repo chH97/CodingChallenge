@@ -13,13 +13,13 @@ import android.Manifest;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.view.View;
-import android.widget.TextView;
 
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
@@ -33,11 +33,15 @@ import de.hvrmn.codingchallenge.datafetching.DataFetcherCallback;
 import de.hvrmn.codingchallenge.model.Car;
 import de.hvrmn.codingchallenge.model.Dataset;
 import de.hvrmn.codingchallenge.recycler.OnItemClickListener;
+import de.hvrmn.codingchallenge.recycler.OnSnapPositionChangeListener;
+import de.hvrmn.codingchallenge.recycler.OnSnapScrollListener;
 import de.hvrmn.codingchallenge.recycler.RecyclerAdapter;
 
 public class MainActivity extends AppCompatActivity implements OnMapReadyCallback {
 
     private static final String BUNDLE_KEY = "BundleKey";
+    private static final int ZOOM_LEVEL_CLOSE = 18;
+    private static final int PADDING_AROUND_BOUNDS = 100;
 
     private MapView mapView;
     private GoogleMap googleMap;
@@ -117,6 +121,34 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         });
 
         recyclerView.setAdapter(adapter);
+
+        recyclerView.addOnScrollListener(new OnSnapScrollListener(snapHelper, layoutManager, new OnSnapPositionChangeListener() {
+            @Override
+            public void onSnapPositionChanged(int snapPosition) {
+                Marker marker = getMarkerByCarTag(dataset.getPlacemarks().get(snapPosition));
+                marker.showInfoWindow();
+                displayOnlyOneMarker(marker);
+                currentMarker = marker;
+                animateCameraToSpecificPosition(marker.getPosition());
+            }
+        }));
+    }
+
+    private void animateCameraToSpecificPosition(LatLng latLng) {
+        CameraPosition cameraPosition = new CameraPosition.Builder()
+                .target(latLng)
+                .zoom(ZOOM_LEVEL_CLOSE)
+                .build();
+        googleMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
+    }
+
+    private Marker getMarkerByCarTag(Car car) {
+        for (Marker marker : markers) {
+            if (marker.getTag().equals(car)) {
+                return marker;
+            }
+        }
+        return null;
     }
 
     private void setUpListeners() {
@@ -155,8 +187,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     }
 
     private void animateCameraToFitBounds(LatLngBounds bounds) {
-        int padding = 100;
-        CameraUpdate cu = CameraUpdateFactory.newLatLngBounds(bounds, padding);
+        CameraUpdate cu = CameraUpdateFactory.newLatLngBounds(bounds, PADDING_AROUND_BOUNDS);
         googleMap.animateCamera(cu);
     }
 
@@ -188,6 +219,9 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         for (Marker marker : markers) {
             if (!marker.equals(highlightedMarker)) {
                 marker.setVisible(false);
+            } else {
+                marker.setVisible(true);
+                marker.showInfoWindow();
             }
         }
     }
