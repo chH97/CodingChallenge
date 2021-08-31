@@ -4,6 +4,7 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
+import androidx.core.content.res.ResourcesCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.LinearSnapHelper;
 import androidx.recyclerview.widget.RecyclerView;
@@ -11,6 +12,8 @@ import androidx.recyclerview.widget.SnapHelper;
 
 import android.Manifest;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
+import android.graphics.drawable.BitmapDrawable;
 import android.os.Bundle;
 import android.view.View;
 
@@ -19,6 +22,7 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
@@ -103,6 +107,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 LatLng position = new LatLng(car.getCoordinates().get(1), car.getCoordinates().get(0));
                 Marker marker = googleMap.addMarker(new MarkerOptions().position(position).title(car.getName()));
                 marker.setTag(car);
+                marker.setIcon(BitmapDescriptorFactory.fromBitmap(getMarkerIcon()));
                 markers.add(marker);
                 builder.include(position);
             }
@@ -112,6 +117,15 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         } else {
             // TODO
         }
+    }
+
+    private Bitmap getMarkerIcon() {
+        int height = 100;
+        int width = 100;
+        BitmapDrawable drawable = (BitmapDrawable) ResourcesCompat.getDrawable(getResources(), R.drawable.location, null);
+        Bitmap b = drawable.getBitmap();
+        Bitmap smallMarker = Bitmap.createScaledBitmap(b, width, height, false);
+        return smallMarker;
     }
 
     private void setUpFloatingActionButton() {
