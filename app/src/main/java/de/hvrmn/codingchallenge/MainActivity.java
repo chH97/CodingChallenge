@@ -163,8 +163,10 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 } else {
                     currentMarker = marker;
                     displayOnlyOneMarker(marker);
+                    marker.showInfoWindow();
+                    animateCameraToSpecificPosition(marker.getPosition());
                 }
-                return false;
+                return true;
             }
         });
 
