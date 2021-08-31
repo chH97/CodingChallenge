@@ -116,7 +116,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         RecyclerAdapter adapter = new RecyclerAdapter(this, dataset.getPlacemarks(), new OnItemClickListener<Car>() {
             @Override
             public void onItemClick(Car object, View view) {
-
+                // TODO
             }
         });
 
@@ -194,7 +194,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     }
 
     @Override
-    public void onMapReady(GoogleMap map) {
+    public void onMapReady(@NonNull GoogleMap map) {
         googleMap = map;
         googleMap.getUiSettings().setMapToolbarEnabled(false);
         googleMap.getUiSettings().setMyLocationButtonEnabled(false);
@@ -235,7 +235,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     }
 
     @Override
-    public void onSaveInstanceState(Bundle outState) {
+    public void onSaveInstanceState(@NonNull Bundle outState) {
         super.onSaveInstanceState(outState);
 
         Bundle mapViewBundle = outState.getBundle(BUNDLE_KEY);
