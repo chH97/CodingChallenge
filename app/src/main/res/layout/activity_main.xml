@@ -32,7 +32,7 @@
         android:layout_marginEnd="20dp"
         android:layout_marginRight="20dp"
         android:layout_marginBottom="70dp"
-        app:backgroundTint="@color/white"
+        app:backgroundTint="@color/white_alternative"
         app:fabSize="mini"
         app:layout_anchor="@id/included_bottom_sheet_layout"
         app:layout_anchorGravity="top|right"

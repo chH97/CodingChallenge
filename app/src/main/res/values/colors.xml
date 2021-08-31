@@ -8,10 +8,10 @@
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
 
-    <color name="white_alternative">#f5f5f7</color>
+    <color name="white_alternative">#FBFBFB</color>
     <color name="grey">#C0C0C0</color>
     <color name="blue">#45affa</color>
     <color name="dark_blue">#0e90db</color>
 
-    <color name="list_background">#FFFFFF</color>
+    <color name="list_background">@color/white_alternative</color>
 </resources>

@@ -17,10 +17,12 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerViewHolder> {
     private final LayoutInflater inflater;
     private List<Car> cars;
     private OnItemClickListener<Car> listener;
+    private Context context;
 
     public RecyclerAdapter(Context context, List<Car> cars, OnItemClickListener<Car> listener) {
         super();
         inflater = LayoutInflater.from(context);
+        this.context = context;
         this.cars = cars;
         this.listener = listener;
     }
@@ -33,7 +35,7 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerViewHolder> {
 
     @Override
     public void onBindViewHolder(@NonNull RecyclerViewHolder holder, int position) {
-        holder.bind(cars.get(position), listener);
+        holder.bind(cars.get(position), listener, context);
     }
 
     @Override

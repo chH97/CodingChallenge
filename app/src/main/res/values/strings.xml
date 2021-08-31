@@ -1,3 +1,6 @@
 <resources>
     <string name="app_name">CodingChallenge</string>
+
+    <string name="coordinates_string">%1$f/%2$f</string>
+    <string name="interior_exterior_string">In: %1$s / Ex: %2$s</string>
 </resources>
