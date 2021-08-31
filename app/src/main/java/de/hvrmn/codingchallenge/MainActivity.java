@@ -25,6 +25,7 @@ import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -65,6 +66,8 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         setUpMapView(savedInstanceState);
 
         retrieveData();
+
+        setUpFloatingActionButton();
     }
 
     private void setUpMapView(Bundle savedInstanceState) {
@@ -109,6 +112,18 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         } else {
             // TODO
         }
+    }
+
+    private void setUpFloatingActionButton() {
+        FloatingActionButton floatingActionButton = findViewById(R.id.floatingActionButton);
+        floatingActionButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (initialFitAllMarkerBounds != null) {
+                    animateCameraToFitBounds(initialFitAllMarkerBounds);
+                }
+            }
+        });
     }
 
     private void setUpRecyclerView(Dataset dataset) {

@@ -24,4 +24,18 @@
         android:id="@+id/included_bottom_sheet_layout"
         layout="@layout/bottom_sheet" />
 
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/floatingActionButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="top"
+        android:layout_marginEnd="20dp"
+        android:layout_marginRight="20dp"
+        android:layout_marginBottom="70dp"
+        app:backgroundTint="@color/white"
+        app:fabSize="mini"
+        app:layout_anchor="@id/included_bottom_sheet_layout"
+        app:layout_anchorGravity="top|right"
+        app:srcCompat="@drawable/ic_baseline_zoom_out_map_24" />
+
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
