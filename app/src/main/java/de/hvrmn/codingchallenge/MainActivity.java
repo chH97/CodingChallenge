@@ -4,10 +4,15 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.LinearSnapHelper;
+import androidx.recyclerview.widget.RecyclerView;
+import androidx.recyclerview.widget.SnapHelper;
 
 import android.Manifest;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.view.View;
 import android.widget.TextView;
 
 import com.google.android.gms.maps.CameraUpdate;
@@ -27,6 +32,8 @@ import de.hvrmn.codingchallenge.datafetching.DataFetcher;
 import de.hvrmn.codingchallenge.datafetching.DataFetcherCallback;
 import de.hvrmn.codingchallenge.model.Car;
 import de.hvrmn.codingchallenge.model.Dataset;
+import de.hvrmn.codingchallenge.recycler.OnItemClickListener;
+import de.hvrmn.codingchallenge.recycler.RecyclerAdapter;
 
 public class MainActivity extends AppCompatActivity implements OnMapReadyCallback {
 
@@ -66,6 +73,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             @Override
             public void onDataRetrieved(Dataset dataset) {
                 addAllMarkersToMap(dataset);
+                setUpRecyclerView(dataset);
             }
 
             @Override
@@ -93,12 +101,28 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         }
     }
 
+    private void setUpRecyclerView(Dataset dataset) {
+        RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false);
+        RecyclerView recyclerView = findViewById(R.id.recyclerView);
+        recyclerView.setLayoutManager(layoutManager);
+
+        SnapHelper snapHelper = new LinearSnapHelper();
+        snapHelper.attachToRecyclerView(recyclerView);
+
+        RecyclerAdapter adapter = new RecyclerAdapter(this, dataset.getPlacemarks(), new OnItemClickListener<Car>() {
+            @Override
+            public void onItemClick(Car object, View view) {
+
+            }
+        });
+
+        recyclerView.setAdapter(adapter);
+    }
+
     private void setUpListeners() {
         googleMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
             @Override
             public boolean onMarkerClick(@NonNull Marker marker) {
-                TextView t = findViewById(R.id.name);
-                t.setText(marker.getTitle());
                 if (currentMarker != null && currentMarker.equals(marker)) {
                     setAllMarkersVisible();
                     marker.hideInfoWindow();
