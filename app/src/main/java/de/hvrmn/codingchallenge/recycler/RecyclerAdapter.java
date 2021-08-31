@@ -40,4 +40,8 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerViewHolder> {
     public int getItemCount() {
         return cars.size();
     }
+
+    public int getItemPosition(Car car) {
+        return cars.indexOf(car);
+    }
 }

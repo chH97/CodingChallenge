@@ -24,6 +24,7 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.material.bottomsheet.BottomSheetBehavior;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -48,6 +49,9 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     private LatLngBounds initialFitAllMarkerBounds;
     private List<Marker> markers;
     private Marker currentMarker;
+    private RecyclerAdapter adapter;
+    private RecyclerView recyclerView;
+    private BottomSheetBehavior<View> bottomSheetBehavior;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -55,6 +59,8 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         setContentView(R.layout.activity_main);
         markers = new ArrayList<>();
         currentMarker = null;
+        recyclerView = findViewById(R.id.recyclerView);
+        bottomSheetBehavior = BottomSheetBehavior.from(findViewById(R.id.included_bottom_sheet_layout));
 
         setUpMapView(savedInstanceState);
 
@@ -107,13 +113,13 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     private void setUpRecyclerView(Dataset dataset) {
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false);
-        RecyclerView recyclerView = findViewById(R.id.recyclerView);
+
         recyclerView.setLayoutManager(layoutManager);
 
         SnapHelper snapHelper = new LinearSnapHelper();
         snapHelper.attachToRecyclerView(recyclerView);
 
-        RecyclerAdapter adapter = new RecyclerAdapter(this, dataset.getPlacemarks(), new OnItemClickListener<Car>() {
+        adapter = new RecyclerAdapter(this, dataset.getPlacemarks(), new OnItemClickListener<Car>() {
             @Override
             public void onItemClick(Car object, View view) {
                 // TODO
@@ -159,12 +165,14 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                     setAllMarkersVisible();
                     marker.hideInfoWindow();
                     currentMarker = null;
-                    return true;
+                    bottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
                 } else {
                     currentMarker = marker;
                     displayOnlyOneMarker(marker);
                     marker.showInfoWindow();
                     animateCameraToSpecificPosition(marker.getPosition());
+                    bottomSheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
+                    scrollCorrespondingListItem(marker);
                 }
                 return true;
             }
@@ -176,6 +184,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 marker.hideInfoWindow();
                 setAllMarkersVisible();
                 currentMarker = null;
+                bottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
             }
         });
 
@@ -184,8 +193,14 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             public void onMapClick(@NonNull LatLng latLng) {
                 setAllMarkersVisible();
                 currentMarker = null;
+                bottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
             }
         });
+    }
+
+    private void scrollCorrespondingListItem(Marker marker) {
+        Car car = (Car) marker.getTag();
+        recyclerView.scrollToPosition(adapter.getItemPosition(car));
     }
 
     private void animateCameraToFitBounds(LatLngBounds bounds) {
